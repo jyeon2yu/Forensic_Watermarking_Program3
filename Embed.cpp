@@ -160,16 +160,21 @@ Mat Embed(Mat& HostImg, Mat& QrImg)
 	}
 
 	// 1024개의 8*8 블록에 dct 적용
+	int enter = 0;
 	for (int i = 0; i < 1024; i++)
 	{
 		//      dct(HL_blocks[i], HL_blocks[i]);
 		//      dct(HH_blocks[i], HH_blocks[i]);
 		dct(LH_blocks[i], LH_blocks[i]);
+		enter++;
+		if (enter == 32) {
+			enter = 0;
+		}
 	}
 
 	// 각 부대역의 1024개의 8*8 블럭들을 대상으로 워터마크 데이터 삽입 진행
 	//1024개의 각 8*8블럭 DC계수(Z)에 CRT 적용하여 워터마크 삽입
-	int enter = 0;
+	enter = 0;
 	for (int i = 0; i < 1024; i++)
 	{
 		//      HH_blocks[i].at<float>(0, 0) = Embed_CRT((int)HH_blocks[i].at<float>(0, 0), value[i]);
@@ -179,6 +184,10 @@ Mat Embed(Mat& HostImg, Mat& QrImg)
 
 		//      dct(HH_blocks[i], HH_blocks[i], DCT_INVERSE);
 		//      dct(HL_blocks[i], HL_blocks[i], DCT_INVERSE);
+		enter++;
+		if (enter == 32) {
+			enter = 0;
+		}
 		dct(LH_blocks[i], LH_blocks[i], DCT_INVERSE);
 	}
 

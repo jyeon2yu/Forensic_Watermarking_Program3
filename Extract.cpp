@@ -17,6 +17,10 @@ void ExtractWatermark(Mat& marked_img)
 float Extract_CRT(Mat blocks)
 {
 	int Z = blocks.at<float>(0, 0);
+	if (Z == 40 || Z == 44) {
+		Z += 60;
+	}
+
 	int p = Z % m;
 	int q = Z % n;
 
@@ -37,11 +41,11 @@ float Extract_CRT(Mat blocks)
 void Extract(Mat& Marked_Image)
 {
 	//imshow("Marked_Image", Marked_Image);
-	getPSNR(Marked_Image); // 원본 이미지와 삽입 이미지의 PSNR 값 계산을 위함
+	
 
 	Mat yuv_arr[3];
 	cvtColor(Marked_Image, Marked_Image, COLOR_RGB2YCrCb);   // RGB to YCrCb
-	split(Marked_Image, yuv_arr);                      // 채널 분리
+	split(Marked_Image, yuv_arr);						     // 채널 분리
 	Mat Marked_Y_channel = Mat(Marked_Image.cols, Marked_Image.rows, Marked_Image.type());
 	int QRcodeSize;
 
@@ -49,7 +53,7 @@ void Extract(Mat& Marked_Image)
 	yuv_arr[0].convertTo(Marked_Y_channel, CV_32F);    //uchar -> float
 
 	// 추출한 QRcode 계수들을 저장할 행렬
- //   Mat HH_recoverd_QRcode_Pixel = Mat(32, 32, CV_8UC1);
+ //		 Mat HH_recoverd_QRcode_Pixel = Mat(32, 32, CV_8UC1);
 	Mat LH_recoverd_QRcode_Pixel = Mat(32, 32, CV_8UC1);
 	//   Mat HL_recoverd_QRcode_Pixel = Mat(32, 32, CV_8UC1);
 
@@ -95,6 +99,10 @@ void Extract(Mat& Marked_Image)
 		//      dct(HH_blocks[i], HH_blocks[i]);
 		//      dct(HL_blocks[i], HL_blocks[i]);
 		dct(LH_blocks[i], LH_blocks[i]);
+		enter++;
+		if (enter == 32) {
+			enter = 0;
+		}
 	}
 
 	// 각 부대역의 1024개의 블럭들을 대상으로 삽입된 워터마크 추출 진행
@@ -178,5 +186,7 @@ void Extract(Mat& Marked_Image)
 	//   imwrite("HL_QRcode.png", BIG_QR_HL);
 	imwrite("DWT_DCT_CRT_LH_QRcode.png", BIG_QR_LH);
 
+	cout << "**********DWT-DCT-CRT**********" << endl;
+	getPSNR(Marked_Image); // 원본 이미지와 삽입 이미지의 PSNR 값 계산을 위함
 	getNCC();      // 삽입된 워터마크와 추출된 워터마크 간 NCC 값 계산
 }

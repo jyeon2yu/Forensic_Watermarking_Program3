@@ -23,7 +23,7 @@ void getPSNR(Mat& Marked_Img)
 	Mat Marked;
 	Mat s1;
 
-	Original = imread("lena.png");
+	Original = imread("Lena.png");
 	Marked_Img.copyTo(Marked);
 
 	absdiff(Original, Marked, s1);	// | Original - Marked |
@@ -36,8 +36,7 @@ void getPSNR(Mat& Marked_Img)
 	
 	double mse = sse / (double)(Original.channels() * Original.total());
 	double psnr = 10.0 * log10((255 * 255) / mse);
-	cout << endl;
-	cout << "psnr : " << psnr << endl;
+	cout << "PSNR : " << psnr << endl;
 }
 
 // NCC 값 계산
@@ -65,14 +64,33 @@ void getNCC()
 	float avgExtracted = 0.0f;
 	float stdExtracted = 0.0f;
 
+	int one = 0;
 	for (y = 0; y < 100; y++)
 	{
 		for (x = 0; x < 100; x++)
 		{
-			avgOriginal += Original_QRcode.at<char>(y, x); // 원 영상의 모든 픽셀 값의 합
+			if ((int)Extracted_QRcode.at<char>(y, x) == 0) one++;//black
+		}
+	}
+	one = 0;
+	for (y = 0; y < 100; y++)
+	{
+		for (x = 0; x < 100; x++)
+		{
+			if ((int)Extracted_QRcode.at<char>(y, x) == 0) one++;//black
+		}
+	}
+
+	one = 0;
+	for (y = 0; y < 100; y++)
+	{
+		for (x = 0; x < 100; x++)
+		{
+			avgOriginal += Original_QRcode.at<char>(y, x); // 원 영상의 모든 픽셀 값의
 			avgExtracted += Extracted_QRcode.at<char>(y, x); // 추출된 영상의 모든 픽셀 값의 합
 		}
 	}
+	
 	avgOriginal /= 10000;
 	avgExtracted /= 10000;
 
@@ -93,7 +111,7 @@ void getNCC()
 	else if (cnt == 1)
 	   cout << "HL NCC : " << Value << endl;
 	else if (cnt == 2)*/
-	cout << "*************DWT-DCT-CRT NCC : " << Value << endl;
+	cout << "NCC : " << Value << endl;
 	//   cout << "*************DWT-DCT-CRT LH NCC : " << Value << endl;
 	//cout << "*************DCT-CRT NCC : " << Value << endl;
 	//cnt++;
